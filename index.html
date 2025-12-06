@@ -1,192 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 3D Painter (Final)</title>
+    <title>Pandora Premium</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #1a1a1a;
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-        }
-
-        /* UI Overlay */
+        body { margin: 0; overflow: hidden; background-color: #1a1a1a; font-family: 'Segoe UI', sans-serif; color: white; }
+        
         #ui-container {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(30, 30, 30, 0.95);
-            border: 1px solid #444;
-            padding: 15px 25px;
-            border-radius: 12px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 10;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(30, 30, 30, 0.95); border: 1px solid #444;
+            padding: 15px 25px; border-radius: 12px;
+            display: flex; gap: 20px; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10;
         }
 
-        /* Generator Panel */
         #generator-panel {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(30, 30, 30, 0.95);
-            border: 1px solid #444;
-            padding: 20px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(30, 30, 30, 0.95); border: 1px solid #444;
+            padding: 20px; border-radius: 12px; width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
+            display: flex; flex-direction: column; gap: 12px;
         }
 
-        h3 {
-            margin: 0;
-            font-size: 14px;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        h3 { margin: 0; font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
 
-        input[type="text"],
-        input[type="password"] {
-            background: #333;
-            border: 1px solid #555;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
+        input[type="text"], input[type="password"] {
+            background: #333; border: 1px solid #555; color: white;
+            padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box;
             font-size: 14px;
         }
 
         .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #2a2a2a;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #444;
+            display: flex; align-items: center; gap: 10px;
+            background: #2a2a2a; padding: 10px; border-radius: 6px; border: 1px solid #444;
         }
-
-        .checkbox-group input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            font-size: 13px;
-            color: #eee;
-            cursor: pointer;
-        }
-
-        .checkbox-group small {
-            display: block;
-            font-size: 10px;
-            color: #888;
-            margin-top: 2px;
-        }
+        .checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-group label { font-size: 13px; color: #eee; cursor: pointer; }
+        .checkbox-group small { display: block; font-size: 10px; color: #888; margin-top: 2px; }
 
         button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
+            background: #4CAF50; color: white; border: none; padding: 12px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
             transition: background 0.2s;
         }
-
-        button:hover {
-            background: #45a049;
-        }
-
-        button:disabled {
-            background: #555;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Export Button Style */
-        #exportBtn {
-            background: #E91E63;
-            margin-left: 10px;
-        }
-
-        #exportBtn:hover {
-            background: #C2185B;
-        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        
+        #exportBtn { background: #E91E63; margin-left: 10px; }
+        #exportBtn:hover { background: #C2185B; }
 
         .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #333;
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-            display: none;
+            width: 100%; height: 8px; background: #333; border-radius: 4px;
+            margin-top: 5px; overflow: hidden; display: none;
         }
+        .progress-fill { width: 0%; height: 100%; background: #00bcd4; transition: width 0.5s; }
+        
+        #status-text { font-size: 12px; color: #bbb; margin-top: 5px; min-height: 15px; font-family: monospace; }
+        #funny-text { font-size: 13px; color: #00bcd4; margin-top: 5px; font-style: italic; min-height: 20px; font-weight: bold;}
 
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #00bcd4;
-            transition: width 0.5s;
-        }
-
-        #status-text {
-            font-size: 12px;
-            color: #bbb;
-            margin-top: 5px;
-            min-height: 15px;
-            font-family: monospace;
-        }
-
-        #funny-text {
-            font-size: 13px;
-            color: #00bcd4;
-            margin-top: 5px;
-            font-style: italic;
-            min-height: 20px;
-            font-weight: bold;
-        }
-
-        .tool-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        label.tool-label {
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #888;
-        }
-
-        input[type="color"] {
-            border: none;
-            width: 35px;
-            height: 35px;
-            cursor: pointer;
-            background: none;
-        }
+        .tool-group { display: flex; align-items: center; gap: 8px; }
+        label.tool-label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; }
+        input[type="color"] { border: none; width: 35px; height: 35px; cursor: pointer; background: none; }
     </style>
-
+    
     <script type="importmap">
-        {
+        {   
             "imports": {
                 "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
                 "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
@@ -194,17 +73,15 @@
         }
     </script>
 </head>
-
 <body>
 
-    <!-- AI Generator Panel -->
     <div id="generator-panel">
         <h3>1. Meshy API Key</h3>
         <input type="password" id="apiKey" placeholder="Paste Key Here">
-
+        
         <h3>2. Description</h3>
         <input type="text" id="promptInput" placeholder="e.g. A cyberpunk samurai helmet">
-
+        
         <!-- Quality Toggle -->
         <div class="checkbox-group">
             <input type="checkbox" id="hqToggle">
@@ -214,22 +91,16 @@
             </div>
         </div>
 
-        <button id="generateBtn" onclick="startGeneration()">Generate (Meshy 6)</button>
-
+        <button id="generateBtn" onclick="startGeneration()">Generate</button>
+        
         <div class="progress-bar" id="progressBar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
         <div id="status-text">Ready</div>
-        <div id="funny-text"></div> <!-- Funny Text Container -->
-
-        <div style="background:#442222; padding:8px; border-radius:4px; margin-top:5px;">
-            <small style="color:#ffaaaa; font-size:10px; display:block; line-height:1.2;">
-                <b>IMPORTANT:</b> Ensure your "CORS Unblock" Browser Extension is ON, or this will fail.
-            </small>
-        </div>
+        <div id="funny-text"></div>
     </div>
 
-    <!-- Painting UI -->
+    <!-- boyama yeri -->
     <div id="ui-container">
         <div class="tool-group">
             <label class="tool-label">Color</label>
@@ -264,7 +135,7 @@
         // --- FUNNY TEXTS ---
         const FUNNY_PHRASES = [
             "Bir seyler pisiriyoruz...",
-            "Ascimiz sicagligi kaldiramadi...",
+            "Ascimiz sicakligi kaldiramadi...",
             "Soz veriyoruz bekledginize degecek",
             "Oops, modelimize erkek eli degmis hemen duzeltiyoruz...",
             "Son dokunuslari yapiyoruz....",
@@ -307,7 +178,7 @@
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
         let isPainting = false;
-        const paintables = {};
+        const paintables = {}; 
         let currentModel = null;
 
         const elColor = document.getElementById('colorPicker');
@@ -334,9 +205,9 @@
             if (mesh.material.map && mesh.material.map.image) {
                 try {
                     ctx.drawImage(mesh.material.map.image, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
-                } catch (e) {
+                } catch(e) {
                     ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                    ctx.fillRect(0,0, CANVAS_SIZE, CANVAS_SIZE);
                 }
             } else {
                 ctx.fillStyle = '#DDDDDD';
@@ -345,26 +216,25 @@
 
             const texture = new THREE.CanvasTexture(canvas);
             texture.colorSpace = THREE.SRGBColorSpace;
-            texture.flipY = false;
+            texture.flipY = false; 
 
             const newMat = mesh.material.clone();
             newMat.map = texture;
             newMat.side = THREE.DoubleSide;
-            newMat.transparent = false;
-
+            newMat.transparent = false; 
+            
             mesh.material = newMat;
             paintables[mesh.uuid] = { ctx, texture };
         }
 
-        // --- FUNNY TEXT LOGIC ---
         function startFunnyText() {
             const el = document.getElementById('funny-text');
             let idx = 0;
             el.innerText = FUNNY_PHRASES[0];
             el.style.display = 'block';
-
-            if (funnyInterval) clearInterval(funnyInterval);
-
+            
+            if(funnyInterval) clearInterval(funnyInterval);
+            
             funnyInterval = setInterval(() => {
                 idx = (idx + 1) % FUNNY_PHRASES.length;
                 el.innerText = FUNNY_PHRASES[idx];
@@ -372,19 +242,23 @@
         }
 
         function stopFunnyText() {
-            if (funnyInterval) clearInterval(funnyInterval);
+            if(funnyInterval) clearInterval(funnyInterval);
             document.getElementById('funny-text').innerText = "";
         }
 
-        // --- EXPORT LOGIC ---
-        window.exportModel = function () {
+        // --- EXPORT ---
+        window.exportModel = function() {
             if (!currentModel) {
                 alert("No model to export!");
                 return;
             }
 
             const exporter = new GLTFExporter();
-            const options = { binary: true, maxTextureSize: CANVAS_SIZE };
+            
+            const options = {
+                binary: true,
+                maxTextureSize: CANVAS_SIZE
+            };
 
             exporter.parse(
                 currentModel,
@@ -397,8 +271,8 @@
                     }
                 },
                 function (error) {
-                    console.error('Export error:', error);
-                    alert("Export failed.");
+                    console.error('An error happened during export:', error);
+                    alert("Export failed. Check console.");
                 },
                 options
             );
@@ -416,28 +290,29 @@
             const link = document.createElement('a');
             link.style.display = 'none';
             document.body.appendChild(link);
+
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
+            
             setTimeout(() => {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
             }, 100);
         }
 
-        // --- GENERATION LOGIC ---
-
-        window.startGeneration = async function () {
+        // --- GENERATION FLOW ---
+        window.startGeneration = async function() {
             const apiKey = document.getElementById('apiKey').value;
             const prompt = document.getElementById('promptInput').value;
             const isHQ = document.getElementById('hqToggle').checked;
-
+            
             const statusEl = document.getElementById('status-text');
             const btn = document.getElementById('generateBtn');
             const progressFill = document.getElementById('progressFill');
             const progressBar = document.getElementById('progressBar');
 
-            if (!apiKey || !prompt) {
+            if(!apiKey || !prompt) {
                 alert("Please enter API Key and Prompt");
                 return;
             }
@@ -446,25 +321,24 @@
             progressBar.style.display = 'block';
             progressFill.style.width = "5%";
             statusEl.innerText = "Initializing Meshy 6...";
-
+            
             startFunnyText();
 
-            const headers = {
+            const headers = { 
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             };
 
             try {
-                // STEP 1: PREVIEW
                 const body = JSON.stringify({
                     mode: "preview",
                     prompt: prompt,
                     art_style: "realistic",
-                    ai_model: "latest"
+                    ai_model: "latest" 
                 });
 
                 const res = await fetch(MESHY_API_URL, { method: 'POST', headers, body });
-                if (!res.ok) throw new Error(await res.text());
+                if(!res.ok) throw new Error(await res.text());
                 const data = await res.json();
                 const previewTaskId = data.result;
 
@@ -474,18 +348,17 @@
                     progressFill.style.width = totalP + "%";
                 });
 
-                if (isHQ) {
-                    // STEP 2: REFINE
+                if(isHQ) {
                     statusEl.innerText = "Refining Geometry...";
-
+                    
                     const refineBody = JSON.stringify({
                         mode: "refine",
                         preview_task_id: previewTaskId,
                         ai_model: "latest"
                     });
-
+                    
                     const refineRes = await fetch(MESHY_API_URL, { method: 'POST', headers, body: refineBody });
-                    if (!refineRes.ok) throw new Error(await refineRes.text());
+                    if(!refineRes.ok) throw new Error(await refineRes.text());
                     const refineData = await refineRes.json();
                     const refineTaskId = refineData.result;
 
@@ -504,6 +377,7 @@
                 }
 
                 btn.disabled = false;
+                stopFunnyText();
 
             } catch (err) {
                 console.error(err);
@@ -520,7 +394,7 @@
                     try {
                         const res = await fetch(`${MESHY_API_URL}/${taskId}`, { headers });
                         const data = await res.json();
-
+                        
                         onUpdate(data.status, data.progress || 0);
 
                         if (data.status === "SUCCEEDED") {
@@ -530,57 +404,61 @@
                             clearInterval(interval);
                             reject(new Error(data.task_error?.message || "Task Failed"));
                         }
-                    } catch (e) {
+                    } catch(e) {
                         clearInterval(interval);
                         reject(e);
                     }
-                }, 3000);
+                }, 3000); 
             });
         }
 
-        // --- MODEL LOADING (UPDATED) ---
+        // *** BURASI ÖNEMLİ: PROXY YOK, URL DİREKT KULLANILIYOR ***
         function loadGlbModel(url) {
             const loader = new GLTFLoader();
             const statusEl = document.getElementById('status-text');
-
-            if (currentModel) scene.remove(currentModel);
+            
+            if(currentModel) scene.remove(currentModel);
 
             statusEl.innerText = "Downloading Model...";
 
-            // NO PROXY: Requires CORS Extension
-            loader.load(url, (gltf) => {
-                currentModel = gltf.scene;
+            // Proxy YOK: direkt Meshy URL’si ile yükle
+            loader.load(
+                url,
+                (gltf) => {
+                    currentModel = gltf.scene;
+                    
+                    currentModel.traverse((child) => {
+                        if (child.isMesh) {
+                            prepareMeshForPainting(child);
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
 
-                currentModel.traverse((child) => {
-                    if (child.isMesh) {
-                        prepareMeshForPainting(child);
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                    }
-                });
+                    const box = new THREE.Box3().setFromObject(currentModel);
+                    const maxDim = Math.max(
+                        box.max.x - box.min.x,
+                        box.max.y - box.min.y,
+                        box.max.z - box.min.z
+                    );
+                    currentModel.scale.multiplyScalar(5 / maxDim);
+                    new THREE.Box3().setFromObject(currentModel)
+                        .getCenter(currentModel.position)
+                        .multiplyScalar(-1);
+                    currentModel.position.y += 2.5;
 
-                const box = new THREE.Box3().setFromObject(currentModel);
-                const maxDim = Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z);
-                currentModel.scale.multiplyScalar(5 / maxDim);
-                new THREE.Box3().setFromObject(currentModel).getCenter(currentModel.position).multiplyScalar(-1);
-                currentModel.position.y += 2.5;
-
-                scene.add(currentModel);
-                statusEl.innerText = "Meshy 6 Model Ready!";
-                stopFunnyText();
-                document.getElementById('progressFill').style.width = "100%";
-
-            }, (xhr) => {
-                if (xhr.total > 0) {
-                    const percent = Math.floor((xhr.loaded / xhr.total) * 100);
-                    statusEl.innerText = `Downloading: ${percent}%`;
+                    scene.add(currentModel);
+                    statusEl.innerText = "Meshy 6 Model Ready!";
+                    stopFunnyText();
+                    document.getElementById('progressFill').style.width = "100%";
+                },
+                undefined,
+                (err) => {
+                    console.error(err);
+                    statusEl.innerText = "Download Error";
+                    stopFunnyText();
                 }
-            }, (err) => {
-                console.error(err);
-                statusEl.innerText = "Download Error";
-                stopFunnyText();
-                alert("Download failed. Make sure 'CORS Unblock' extension is ON.");
-            });
+            );
         }
 
         // --- PAINTING ---
@@ -599,12 +477,12 @@
                     let u = intersect.uv.x;
                     let v = intersect.uv.y;
                     if (elFlipX.checked) u = 1.0 - u;
-                    if (elFlipY.checked) v = 1.0 - v;
+                    if (elFlipY.checked) v = 1.0 - v; 
 
                     const ctx = data.ctx;
                     const x = u * CANVAS_SIZE;
                     const y = v * CANVAS_SIZE;
-
+                    
                     const colorHex = elColor.value;
                     const rgb = hexToRgb(colorHex);
                     const opacity = elOpacity.value / 100;
@@ -613,7 +491,7 @@
                     const grad = ctx.createRadialGradient(x, y, 0, x, y, size);
                     grad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`);
                     grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
-
+                    
                     ctx.fillStyle = grad;
                     ctx.beginPath();
                     ctx.arc(x, y, size, 0, 2 * Math.PI);
@@ -625,10 +503,10 @@
             }
         }
 
-        window.addEventListener('mousedown', (e) => {
-            if (e.target.closest('#ui-container') || e.target.closest('#generator-panel')) return;
-            isPainting = true;
-            paint(e);
+        window.addEventListener('mousedown', (e) => { 
+            if(e.target.closest('#ui-container') || e.target.closest('#generator-panel')) return;
+            isPainting = true; 
+            paint(e); 
         });
         window.addEventListener('mousemove', paint);
         window.addEventListener('mouseup', () => { isPainting = false; controls.enabled = true; });
@@ -646,5 +524,4 @@
         animate();
     </script>
 </body>
-
 </html>
