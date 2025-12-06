@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandora Signature | The Masterpiece</title>
+    
+    <!-- Google Fonts: Premium Tipografi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <!-- Animasyon Kütüphaneleri -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+
+    <style>
+        /* --- GENEL STİL & DEĞİŞKENLER --- */
+        :root {
+            --bg-color: #050505;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent-gold: #d4af37;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, p { margin: 0; }
+
+        /* Arka Plan Parçacıkları (Canlılık için) */
+        .particles-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        /* --- NAVİGASYON --- */
+        nav {
+            position: fixed; top: 0; width: 100%;
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            box-sizing: border-box;
+        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 0.1em; font-weight: 600; }
+        .nav-links span { margin-left: 25px; font-size: 0.9rem; color: #aaa; cursor: pointer; transition: 0.3s; }
+        .nav-links span:hover { color: #fff; }
+
+        /* --- HERO (GİRİŞ) BÖLÜMÜ --- */
+        .hero {
+            height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; z-index: 2;
+        }
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.1;
+            background: linear-gradient(180deg, #ffffff 0%, #666666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.2rem; color: var(--text-secondary); max-width: 500px; text-align: center;
+        }
+        .scroll-indicator {
+            position: absolute; bottom: 40px;
+            font-size: 0.8rem; color: #555; text-transform: uppercase; letter-spacing: 2px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+        /* --- SCROLL SAHNESİ --- */
+        .showcase-container {
+            position: relative;
+            height: 350vh; /* Optimum uzunluk: Ne çok hızlı ne çok boş */
+            background: transparent;
+        }
+        .sticky-stage {
+            position: sticky; top: 0; height: 100vh; width: 100%;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+            perspective: 1000px; z-index: 10;
+        }
+
+        /* 3D Bileklik */
+        .the-bracelet {
+            width: 350px; height: 350px; border-radius: 50%;
+            background: conic-gradient(from 45deg, #1a1a1a, #ffffff, #1a1a1a, #ffffff, #1a1a1a);
+            position: absolute; z-index: 5;
+            box-shadow: 0 0 60px rgba(255,255,255,0.1);
+            -webkit-mask: radial-gradient(transparent 63%, black 64%);
+            mask: radial-gradient(transparent 63%, black 64%);
+        }
+        /* Derinlik Halkası */
+        .glow-ring {
+            width: 370px; height: 370px; border-radius: 50%;
+            position: absolute; border: 1px solid rgba(255,255,255,0.1);
+            z-index: 1; opacity: 0.3; transform: scale(0.9);
+        }
+
+        /* Gerçek Charm Resimleri */
+        .charm-img {
+            position: absolute; width: 110px; height: 110px;
+            border-radius: 50%; object-fit: cover;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            border: 2px solid rgba(255,255,255,0.15);
+            z-index: 6; opacity: 0;
+        }
+
+        /* Kayan Yazılar */
+        .floating-text {
+            position: absolute; z-index: 20; text-align: center;
+            opacity: 0; pointer-events: none; width: 100%; padding: 0 20px;
+            transform: translateY(30px);
+        }
+        .floating-text h2 {
+            font-size: 3.5rem; color: #fff; margin-bottom: 10px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            font-family: 'Playfair Display', serif;
+        }
+        .floating-text p {
+            color: #ccc; font-size: 1.2rem; max-width: 500px; margin: 0 auto;
+            background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- DETAYLAR BÖLÜMÜ (Izgara) --- */
+        .details-section {
+            background: #0a0a0a; position: relative; z-index: 30;
+            padding: 100px 5%; color: white;
+        }
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; max-width: 1200px; margin: 0 auto;
+        }
+        .grid-item {
+            background: #111; padding: 40px; border-radius: 15px;
+            border: 1px solid #222; transition: transform 0.3s;
+        }
+        .grid-item:hover { transform: translateY(-10px); background: #151515; }
+        .grid-item h3 { font-size: 1.5rem; margin-bottom: 15px; color: #fff; }
+        .grid-item p { color: #888; line-height: 1.6; }
+
+        /* Footer CTA */
+        .footer-cta {
+            padding: 100px 20px; text-align: center; background: #000;
+            border-top: 1px solid #222;
+        }
+        .btn {
+            display: inline-block; padding: 15px 50px; margin-top: 30px;
+            background: #fff; color: #000; text-decoration: none;
+            border-radius: 30px; font-weight: 600; transition: 0.3s;
+        }
+        .btn:hover { transform: scale(1.05); background: #e0e0e0; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Arka Plan Parıltıları -->
+    <div class="particles-container" id="particles"></div>
+
+    <nav>
+        <div class="logo">PANDORA</div>
+        <div class="nav-links">
+            <span>Charms</span>
+            <span>Bileklikler</span>
+            <span>Koleksiyonlar</span>
+        </div>
+    </nav>
+
+    <!-- GİRİŞ (HERO) -->
+    <section class="hero">
+        <h1 class="hero-title">Anılarını<br>Şekillendir.</h1>
+        <p class="hero-subtitle">Sadece bir aksesuar değil, senin parmak izlerin.</p>
+        <div class="scroll-indicator">(Aşağı Kaydırın)</div>
+    </section>
+
+    <!-- SCROLLYTELLING ALANI -->
+    <div class="showcase-container">
+        <div class="sticky-stage">
+            
+            <!-- Objeler -->
+            <div class="glow-ring"></div>
+            <div class="the-bracelet"></div>
+
+            <!-- Charm Resimleri (Gerçekçi) -->
+            <img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=300&h=300&fit=crop" class="charm-img c1" style="top: 20%; right: 25%;" alt="Charm">
+            <img src="https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=300&h=300&fit=crop" class="charm-img c2" style="bottom: 25%; left: 20%;" alt="Charm">
+            <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&h=300&fit=crop" class="charm-img c3" style="top: 50%; left: 50%; transform: translate(-50%, -50%);" alt="Charm">
+
+            <!-- Metinler -->
+            <div class="floating-text t1">
+                <h2>El İşçiliği</h2>
+                <p>Her detay ustalarımız tarafından özenle işlendi.</p>
+            </div>
+
+            <div class="floating-text t2">
+                <h2>Sonsuz Seçenek</h2>
+                <p>Binlerce kombinasyon ile kendi stilini yarat.</p>
+            </div>
+
+            <div class="floating-text t3">
+                <h2>Unutulmaz Anlar</h2>
+                <p>Hayatındaki en değerli anları bileğinde taşı.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DETAYLAR & SONUÇ -->
+    <section class="details-section">
+        <h2 style="font-size:3rem; text-align:center; margin-bottom:60px; font-family:'Playfair Display'">Mükemmelliğin Standartları</h2>
+        <div class="grid-container">
+            <div class="grid-item">
+                <h3>Saf Gümüş</h3>
+                <p>%100 geri dönüştürülmüş gümüş kullanılarak, çevreye duyarlı üretim teknikleriyle hazırlanmıştır.</p>
+            </div>
+            <div class="grid-item">
+                <h3>El Yapımı</h3>
+                <p>Her bir charm, ortalama 15 farklı zanaatkarın elinden geçerek mükemmel formuna ulaşır.</p>
+            </div>
+            <div class="grid-item">
+                <h3>Ömür Boyu Garanti</h3>
+                <p>Anılarınız bizimle güvende. Tüm takılarımızda bakım ve onarım desteği sunuyoruz.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-cta">
+        <h2 style="color:white; font-size:2.5rem; font-family:'Playfair Display'">Hikayeni Yazmaya Başla</h2>
+        <a href="#" class="btn">Koleksiyonu Keşfet</a>
+        <p style="margin-top:40px; color:#444; font-size:0.8rem;">© 2024 Pandora Jewelry. All rights reserved.</p>
+    </footer>
+
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        // --- 1. Arka Plan Parçacıkları (Yıldız Efekti) ---
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            const size = Math.random() * 3;
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}vw`; p.style.top = `${Math.random() * 100}vh`;
+            p.style.opacity = Math.random() * 0.5 + 0.1;
+            particleContainer.appendChild(p);
+            
+            gsap.to(p, {
+                y: `random(-50, 50)`, x: `random(-30, 30)`,
+                opacity: `random(0.3, 1)`, duration: `random(3, 8)`,
+                repeat: -1, yoyo: true, ease: "sine.inOut"
+            });
+        }
+
+        // --- 2. Smooth Scroll (Lenis) ---
+        // Hata korumalı başlatma
+        try {
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smooth: true
+            });
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+        } catch (e) { console.warn("Lenis init error", e); }
+
+        // --- 3. Animasyon Zaman Çizelgesi ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Giriş Animasyonu (Hero)
+        gsap.from(".hero-title", { opacity: 0, y: 50, duration: 1.5, ease: "power3.out" });
+        gsap.from(".hero-subtitle", { opacity: 0, y: 30, duration: 1.5, delay: 0.2, ease: "power3.out" });
+
+        // Ana Timeline
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".showcase-container",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1, // Akıcı takip
+                pin: true, // Sabitleme
+            }
+        });
+
+        // NOT: "<" işareti, animasyonların üst üste binmesini sağlar (Boşluk olmaması için)
+
+        // ADIM 1: Hero Gider -> Bileklik Gelir -> İlk Yazı Gelir
+        tl.to(".hero", { opacity: 0, scale: 0.8, duration: 2 })
+          .from(".the-bracelet", { scale: 0.2, opacity: 0, rotation: 180, duration: 3 }, "<")
+          .from(".glow-ring", { scale: 0, opacity: 0, duration: 3 }, "<")
+          .to(".t1", { opacity: 1, y: 0, duration: 2 }, "-=1"); // Bileklik tam gelmeden yazı başlasın
+
+        // ADIM 2: İlk Charm Gelir -> Yazı 1 Gider -> Yazı 2 Gelir
+        tl.to(".c1", { opacity: 1, y: -20, duration: 2 }, "<") // Yazı gelirken charm da gelsin
+          .to(".t1", { opacity: 0, y: -50, duration: 1.5 }) // Yazı 1 gider
+          .to(".the-bracelet", { rotation: 45, scale: 1.2, duration: 3 }, "<") // O sırada bileklik dönsün
+          .to(".t2", { opacity: 1, y: 0, duration: 1.5 }, "-=1") // Yazı 2 hemen gelsin
+          .to(".c2", { opacity: 1, y: -30, duration: 2 }, "<"); // Charm 2 de gelsin
+
+        // ADIM 3: Yazı 2 Gider -> Son Yazı ve Charm 3 -> ZOOM FİNALİ
+        tl.to(".t2", { opacity: 0, y: -50, duration: 1.5 })
+          .to(".t3", { opacity: 1, scale: 1.1, duration: 2 }, "-=0.5")
+          .to(".c3", { opacity: 1, scale: 1.2, duration: 2 }, "<")
+          
+          // FİNAL: Hızlanarak Halkanın İçine Girme
+          .to([".t3", ".c1", ".c2", ".c3"], { opacity: 0, scale: 3, duration: 2 }, "+=1") // Her şeyi patlat
+          .to(".the-bracelet", { scale: 40, opacity: 0, duration: 3, ease: "power2.in" }, "<") // Bileklik büyüyüp kaybolsun
+          .to(".glow-ring", { scale: 40, opacity: 0, duration: 3 }, "<");
+
+        // Detaylar bölümü aşağıdan yukarı doğru gelsin
+        gsap.from(".grid-item", {
+            scrollTrigger: {
+                trigger: ".details-section",
+                start: "top 80%",
+            },
+            y: 50, opacity: 0, stagger: 0.2, duration: 1
+        });
+
+    </script>
+</body>
+</html>
